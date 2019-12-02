@@ -3,7 +3,8 @@ from google.cloud import datastore
 def store_visited_users(client, kind, users_list):
     task_key = client.key('visited', kind) 
     entity = datastore.Entity(key=task_key)
-    entity[str(kind)] = users_list
+    entity['visited_users'] = users_list
+    client.put(entity)
     return
 
 def get_visited_users(client, kind):
@@ -20,6 +21,7 @@ def store_data(client, kind, result, users):
     query.projections = ['bm_ids']
     for rs in query.fetch():
         if rs.key.id_or_name == kind:
+            print(rs['bm_ids'])
             bm_list = rs['bm_ids']
     for i in range(len(result)):
         print(result)
@@ -29,6 +31,8 @@ def store_data(client, kind, result, users):
             continue
     task_key = client.key('bm', kind)
     entity = datastore.Entity(key = task_key)
-    entity[str(kind)] = bm_list
+    print('new list here', bm_list)
+    entity['bm_ids'] = bm_list
+    client.put(entity)
     return
 

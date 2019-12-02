@@ -54,6 +54,7 @@ class LogisticRegressionModel():
         muted_users = collections.defaultdict(list)
         for result in query.fetch():
             key = result.key.id_or_name
+            print(result)
             muted_users[key].append(result['bm_ids'])
         users_list = grouped.index.tolist()
         store_visited_users(self.client, kind, users_list)
@@ -82,17 +83,18 @@ class LogisticRegressionModel():
         users = self.group_by_reply_user(kind, self.indexs).index.tolist()
         new_users = []
         for user in users:
-            if user in visited_users:
+            if user not in visited_users:
                 new_users.append(user)
             else:
                 continue
         new_data = self.group_by_reply_user(kind, self.indexs).loc[ new_users , : ]
-        return (new_data.values.tolist(),new_users)
+        return (new_data.values.tolist(), new_users)
 
 
 
 lgObject = LogisticRegressionModel(datastore_client, LogisticRegression, indexs)
 users = lgObject.get_all_kinds()
+store_data(datastore_client, '1106277569752633351', [1,1], [u'11111', u'22222'])
 for user in users:
     model = lgObject.trainingModel(user, indexs)
     (new_data, new_users) = lgObject.get_new_data(user)
